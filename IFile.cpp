@@ -1,6 +1,6 @@
 #include "IFile.h"
 
-IFile::IFile(const std::string filePath, const std::string mode) : filePath(filePath)
+IFile::IFile(const std::string filePath, const std::string mode) : filePath(filePath), openMode()
 {
 	if (mode.find("r") != std::string::npos) openMode |= std::fstream::in;
 	if (mode.find("w") != std::string::npos) openMode |= std::fstream::out;
@@ -19,4 +19,3 @@ IFile::~IFile()
 {
 	file.close();
 }
-

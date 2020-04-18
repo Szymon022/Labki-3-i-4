@@ -11,7 +11,7 @@ IFile::Error BinaryFile::Write(const std::vector<Point>& v)
 {
 	Error retVal = Error(ACCESS_DENIED);
 
-	if (openMode & std::fstream::out)
+	if ((openMode & std::fstream::out) && file.is_open())
 	{
 		file.write((const char *)v.data(), v.size() * sizeof(Point));
 		retVal = Error(SUCCESS);
@@ -24,7 +24,7 @@ IFile::Error BinaryFile::Read(std::vector<Point>& v)
 {
 	Error retVal = Error(ACCESS_DENIED);
 
-	if (openMode & std::fstream::in)
+	if ((openMode & std::fstream::in) && file.is_open())
 	{
 		v.clear();
 		v.resize(length / sizeof(Point));
@@ -39,17 +39,20 @@ IFile::Error BinaryFile::Read(std::vector<Point>& v)
 IFile::Error BinaryFile::Read(Point & p, const int idx)
 {
 	Error retVal = Error(ACCESS_DENIED);
+    if(file.is_open())
+    {
+        if (idx * sizeof(Point) > length)
+        {
+            retVal = Error(OUT_OF_BOUNDS);
+        }
+        else if (openMode & std::fstream::in)
+        {
+            file.seekg(idx * sizeof(Point));
+            file.read((char*)(&p), sizeof(Point));
+            retVal = Error(SUCCESS);
+        }
+    }
 
-	if (idx * sizeof(Point) > length)
-	{
-		retVal = Error(OUT_OF_BOUNDS);
-	}
-	else if (openMode & std::fstream::in)
-	{
-		file.seekg(idx * sizeof(Point));
-		file.read((char*)(&p), sizeof(Point));
-		retVal = Error(SUCCESS);
-	}
 
 	return retVal;
 }
